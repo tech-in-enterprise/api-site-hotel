@@ -1,5 +1,5 @@
 from fastapi import  HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select
 from db.schemas import schema
@@ -9,6 +9,12 @@ from db.models import models
 class UserDependencies():
     def __init__(self, session: Session):
         self.session = session
+
+    def read_user(self):
+        statement = select(models.User).options(joinedload(models.User.role))
+        users = self.session.execute(statement).scalars().all()
+        
+        return users
 
     def read_email(self, email):
         query = select(models.User).where(models.User.user_email == email)

@@ -12,7 +12,7 @@ router = APIRouter()
 
 #Get all data from Hotel
 @router.get("/hotel_data", status_code=status.HTTP_200_OK)
-def get_hotel_data( db: Session = Depends(get_db)):
+def get_hotel_data( db: Session = Depends(get_db)): # current_user: schema.UserSchema = Depends(get_user_logged_in)  ):
     hotel = db.query(models.Hotel).all()
     return hotel
 

@@ -6,7 +6,7 @@ from routes import route_auth
 from routes import route_hotel
 from routes import route_departments
 from routes import route_services
-
+from routes import route_users
 
 #create_bd()
 
@@ -27,6 +27,7 @@ app.add_middleware(
 
 
 app.include_router(route_roles.router)
+app.include_router(route_users.router)
 app.include_router(route_auth.router)
 app.include_router(route_hotel.router)
 app.include_router(route_departments.router)

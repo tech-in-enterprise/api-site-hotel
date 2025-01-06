@@ -4,13 +4,16 @@ from db.config.database import get_db
 from db.schemas import schema
 from dependencies.users import UserDependencies
 from utils.providers import hash_provider, token_provider
-
+from dependencies.auth_utils import get_user_logged_in, validate_user_role
 
 
 router = APIRouter()
 
 @router.post('/sign-up', status_code=status.HTTP_201_CREATED, response_model=schema.UserOutSchema)
-def create_users( user: schema.UserSchema, role_id: int = Body(..., embed=True), hotel_id: int = Body(None, embed=True), session: Session = Depends(get_db)):
+def create_users( user: schema.UserSchema, role_id: int = Body(..., embed=True), hotel_id: int = Body(None, embed=True), session: Session = Depends(get_db),  current_user=Depends(get_user_logged_in)):
+
+    validate_user_role(current_user, allowed_roles=['Administrador'])
+
     # Verifica a existência do usuário pelo e-mail
     find_user = UserDependencies(session).read_email(user.email)
 
