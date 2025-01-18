@@ -25,19 +25,7 @@ class UserSchema(BaseModel):
     email: str
     password: str
 
-# Schema de saída (o que o cliente recebe)
-class UserOutSchema(BaseModel):
-    id: int
-    name: str
-    email: str
-    role: RoleSchema  # Agora é um schema aninhado
-    hotel_id: Optional[int]
-
-    class Config:
-        orm_mode = True
-
 class HotelSchema(BaseModel):
-    id: int
     hotel_name: str
     registered_name: str
     phone_number: str
@@ -53,6 +41,19 @@ class HotelSchema(BaseModel):
 
     class Config:
         orm_mode = True
+
+# Schema de saída (o que o cliente recebe)
+class UserOutSchema(BaseModel):
+    id: int
+    name: str
+    email: str
+    role: RoleSchema 
+    hotel: Optional[HotelSchema] = None 
+    hotel_id: Optional[int]
+
+    class Config:
+        orm_mode = True
+
 
 class HotelAdditionalDataSchema(BaseModel):
     social_media: Optional[str]

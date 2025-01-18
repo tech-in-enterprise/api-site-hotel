@@ -10,11 +10,22 @@ class UserDependencies():
     def __init__(self, session: Session):
         self.session = session
 
-    def read_user(self):
-        statement = select(models.User).options(joinedload(models.User.role))
+
+    def read_user(self, current_user: schema.UserOutSchema):
+        # Verificar o papel do usuário logado
+        if current_user.role.id == 1:
+            # Administrador acessa todos os usuários
+            statement = select(models.User)
+        elif current_user.role.id == 2:
+            # Gerente acessa apenas seu próprio ID
+            statement = select(models.User).where(models.User.id == current_user.id)
+        else:
+            # Outros papéis não têm acesso
+            raise HTTPException(status_code=403, detail="Você não tem permissão para acessar esses dados.")
+
         users = self.session.execute(statement).scalars().all()
-        
         return users
+
 
     def read_email(self, email):
         query = select(models.User).where(models.User.user_email == email)

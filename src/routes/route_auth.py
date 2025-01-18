@@ -16,7 +16,6 @@ def create_users( user: schema.UserSchema, role_id: int = Body(..., embed=True),
 
     # Verifica a existência do usuário pelo e-mail
     find_user = UserDependencies(session).read_email(user.email)
-
     if find_user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='E-mail já cadastrado')
 
@@ -43,13 +42,13 @@ def login(login_data: schema.LoginSchema, session: Session = Depends(get_db)):
     user = UserDependencies(session).read_email(email)
 
     if not user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='E-mail incorreto ou não cadastrado')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='E-mail ou senha incorretos')
     
     #se chegou aqui existe um usuário, agora vai ser verificado a senha 
     verify_password = hash_provider.verify_hash(password, user.user_password)
 
     if not verify_password:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Senha incorreta')
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='E-mail ou senha incorretos')
     
 
     #Gerar Token JWT
