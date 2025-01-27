@@ -13,7 +13,7 @@ class Services():
     #Post Services
     def create_service(self, serviceFromShema: schema.ServiceSchema):
         db_services = models.Service(
-            name = serviceFromShema.name,
+            name = serviceFromShema.name.title(),
             price = serviceFromShema.price,
             department_id = serviceFromShema.department_id
         )

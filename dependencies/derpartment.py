@@ -12,14 +12,15 @@ class Departments():
 
 
     #Post Dependencies
-    def create_department_in_db(self, department: schema.DepartmentSchema):
-        db_department = models.Department(
-            name = department.name.title() #title é um método para deixar a primeira letra de cada palavra maiúscula
-        )
-        self.db.add(db_department)
+    def create_department_in_db(self, department_data: dict):
+        if "name" in department_data:
+            department_data["name"] = department_data["name"].title()
+            
+        new_department = models.Department(**department_data)
+        self.db.add(new_department)
         self.db.commit()
-        self.db.refresh(db_department)
-        return db_department
+        self.db.refresh(new_department)
+        return new_department
     
     #Delete dependencies
     def destroy_department(self, department_id: int):

@@ -20,8 +20,8 @@ class Hotel():
             cnpj = hotel.cnpj,
             street_address = hotel.street_address,
             number_address =  hotel.number_address,
-            city = hotel.city,
-            state = hotel.state,
+            city = hotel.city.title(),
+            state = hotel.state.title(),
             cep = hotel.cep,
         )
         self.db.add(db_hotel)
