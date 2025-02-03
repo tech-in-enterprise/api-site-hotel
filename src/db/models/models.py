@@ -104,6 +104,7 @@ class Service(Base):
     name = Column(String, nullable=False)
     price = Column(Float)
     department_id = Column(Integer, ForeignKey('departments.id')) 
+    hotel_id = Column(Integer, ForeignKey('hotels.id'))
 
     department = relationship("Department", back_populates="service") 
 

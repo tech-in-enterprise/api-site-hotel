@@ -69,6 +69,7 @@ class HotelAdditionalDataSchema(BaseModel):
 class DepartmentSchema(BaseModel):
     id: Optional[int] = None
     name: str
+    hotel_id: int
 
     class Config:
         orm_mode = True
@@ -78,6 +79,7 @@ class ServiceSchema(BaseModel):
     name: str
     price: Optional[float] = None
     department_id: int
+    hotel_id: int
 
     class Config:
         orm_mode = True
