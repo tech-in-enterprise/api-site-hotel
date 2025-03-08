@@ -55,13 +55,26 @@ class UserOutSchema(BaseModel):
         orm_mode = True
 
 
-class HotelAdditionalDataSchema(BaseModel):
-    social_media: Optional[str]
+class ManagementHotelSchema(BaseModel):
+    id: Optional[int] = None
+    image_hotel_url: str
+    instagram_url: str
+    facebook_url: str
     wifi_network: Optional[str]
     wifi_password: Optional[str]
-    amenity: Optional[str]
-    start_time: Optional[str]
-    end_time: Optional[str]
+    reception_phone: Optional[str] = None
+    reservation_phone: Optional[str] = None
+    hotel_id: int
+
+    class Config:
+        orm_mode = True
+
+class AmenitySchema(BaseModel):
+    id: Optional[int] = None
+    name: str
+    start_time: str
+    end_time: str
+    hotel_id: int
 
     class Config:
         orm_mode = True
@@ -69,6 +82,9 @@ class HotelAdditionalDataSchema(BaseModel):
 class DepartmentSchema(BaseModel):
     id: Optional[int] = None
     name: str
+    image_url: str
+    start_time: str
+    end_time: str
     hotel_id: int
 
     class Config:
@@ -79,6 +95,7 @@ class ServiceSchema(BaseModel):
     name: str
     price: Optional[float] = None
     department_id: int
+    hotel_id: int
 
     class Config:
         orm_mode = True

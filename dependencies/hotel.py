@@ -30,23 +30,26 @@ class Hotel():
         return db_hotel
     
 
-class HotelRepository:
-    def __init__(self, db: Session):
+
+#Management Hotel
+class ManagementHotel():
+
+    def __init__(self, db: Session) -> None:
         self.db = db
 
-    # Atualiza as informações do hotel
-    def update_hotel_in_db(self, hotel_id: int, update_data: schema.HotelAdditionalDataSchema):
-        hotel = self.db.query(models.Hotel).filter(models.Hotel.id == hotel_id).first()
-
-        # Verifica se o hotel existe
-        if not hotel:
-            return None
-
-        # Atualiza os campos fornecidos no schema
-        for key, value in update_data.dict(exclude_unset=True).items():
-            setattr(hotel, key, value)
-
-        # Salva as alterações no banco de dados
+    #Post Management Hotel
+    def create_management_hotel_in_db(self, managementHotel: schema.ManagementHotelSchema):
+        db_management_hotel = models.ManagementHotel(
+            image_hotel_url = managementHotel.image_hotel_url,
+            instagram_url = managementHotel.instagram_url,
+            facebook_url = managementHotel.facebook_url,
+            wifi_network = managementHotel.wifi_network,
+            wifi_password = managementHotel.wifi_password,
+            reception_phone = managementHotel.reception_phone,
+            reservation_phone = managementHotel.reservation_phone,
+            hotel_id = managementHotel.hotel_id
+        )
+        self.db.add(db_management_hotel)
         self.db.commit()
-        self.db.refresh(hotel)
-        return hotel
+        self.db.refresh(db_management_hotel)
+        return db_management_hotel

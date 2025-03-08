@@ -47,13 +47,10 @@ def add_department(department: schema.DepartmentSchema, db: Session = Depends(ge
     elif current_user.role.access_level == "Gerente":
         hotel_id = current_user.hotel_id
 
-    # Criar o departamento com o `hotel_id` associado
-    department_data = {
-        "name": department.name,
-        "hotel_id": hotel_id
-    }
+   # Atualiza o hotel_id no objeto department
+    department.hotel_id = hotel_id
 
-    department_created = Departments(db).create_department_in_db(department_data)
+    department_created = Departments(db).create_department_in_db(department)
     return department_created
 
 
@@ -69,9 +66,6 @@ def remove_department(department_id: int, db: Session = Depends(get_db), current
     if not department:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Departamento não encontrado.")
     
-    # Administrador pode deletar qualquer departamento
-    if current_user.role.access_level == "Administrador":
-        pass
 
     # Gerente só pode deletar departamentos associados ao seu hotel
     elif current_user.role.access_level == "Gerente":

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from db.config.database import get_db
 from db.models import models
 from db.schemas import schema
-from dependencies.hotel import Hotel, HotelRepository
+from dependencies.hotel import Hotel, ManagementHotel
 from dependencies.auth_utils import get_user_logged_in, validate_user_role
 
 
@@ -37,20 +37,26 @@ def new_hotel(hotel: schema.HotelSchema, db: Session = Depends(get_db), current_
     hotel_created = Hotel(db).create_hotel_in_db(hotel)
     return hotel_created
 
-#Patch Hotel Amenities
-@router.patch('/update-amenities-hotel/{hotel_id}', status_code=status.HTTP_201_CREATED)
-def update_hotel_amenities(hotel_id: int, data: schema.HotelAdditionalDataSchema, db: Session = Depends(get_db), current_user: models.User = Depends(get_user_logged_in)):
-    
+
+#Post ManagementHotel
+@router.post('/management-hotel',  status_code=status.HTTP_201_CREATED)
+def new_management_hotel(managmentHotel: schema.ManagementHotelSchema, db: Session = Depends(get_db), current_user: models.User = Depends(get_user_logged_in) ):
+
     validate_user_role(current_user, allowed_roles=['Administrador', 'Gerente'])
-    
-    # Instancia o repositório do hotel
-    hotel_repo = HotelRepository(db)
 
-    # Atualiza o hotel no banco de dados
-    updated_hotel = hotel_repo.update_hotel_in_db(hotel_id, data)
+    # Adicionar `hotel_id` ao managementhotel com base no papel do usuário
+    if current_user.role.access_level == "Administrador":
+        if not managmentHotel.hotel_id:
+            raise HTTPException( status_code=status.HTTP_400_BAD_REQUEST, detail="Administradores precisam informar o hotel_id.")
+        hotel_id = managmentHotel.hotel_id
 
-    # Caso o hotel não seja encontrado
-    if not updated_hotel:
-        raise HTTPException(status_code=404, detail="Hotel not found")
+    # Gerente só pode criar para o hotel ao qual pertence
+    elif current_user.role.access_level == "Gerente":
+        hotel_id = current_user.hotel_id
 
-    return updated_hotel
+   # Atualiza o hotel_id no objeto managmentHotel
+    managmentHotel.hotel_id = hotel_id
+
+    management_hotel_created = ManagementHotel(db).create_management_hotel_in_db(managmentHotel)
+    return management_hotel_created
+

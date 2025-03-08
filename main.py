@@ -7,6 +7,7 @@ from routes import route_hotel
 from routes import route_departments
 from routes import route_services
 from routes import route_users
+from routes import route_amenities
 
 #create_bd()
 
@@ -30,5 +31,6 @@ app.include_router(route_roles.router)
 app.include_router(route_users.router)
 app.include_router(route_auth.router)
 app.include_router(route_hotel.router)
+app.include_router(route_amenities.router)
 app.include_router(route_departments.router)
 app.include_router(route_services.router)
