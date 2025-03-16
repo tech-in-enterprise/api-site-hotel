@@ -47,13 +47,10 @@ def add_department(department: schema.DepartmentSchema, db: Session = Depends(ge
     elif current_user.role.access_level == "Gerente":
         hotel_id = current_user.hotel_id
 
-    # Criar o departamento com o `hotel_id` associado
-    department_data = {
-        "name": department.name,
-        "hotel_id": hotel_id
-    }
+   # Atualiza o hotel_id no objeto department
+    department.hotel_id = hotel_id
 
-    department_created = Departments(db).create_department_in_db(department_data)
+    department_created = Departments(db).create_department_in_db(department)
     return department_created
 
 

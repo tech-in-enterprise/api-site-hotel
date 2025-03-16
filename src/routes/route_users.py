@@ -114,6 +114,8 @@ def assign_hotel_to_user( hotel_id: int, session: Session = Depends(get_db), cur
 @router.patch("/users/remove-hotel", response_model=schema.UserOutSchema)
 def remove_hotel_from_user( session: Session = Depends(get_db), current_user: schema.UserOutSchema = Depends(get_user_logged_in)):
 
+    validate_user_role(current_user, allowed_roles=["Administrador"])
+
     # Obter o usuário logado
     user = session.query(models.User).filter(models.User.id == current_user.id).first()
     if not user:

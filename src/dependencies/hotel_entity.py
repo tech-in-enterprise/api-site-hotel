@@ -30,23 +30,4 @@ class Hotel():
         return db_hotel
     
 
-class HotelRepository:
-    def __init__(self, db: Session):
-        self.db = db
 
-    # Atualiza as informações do hotel
-    def update_hotel_in_db(self, hotel_id: int, update_data: schema.HotelAdditionalDataSchema):
-        hotel = self.db.query(models.Hotel).filter(models.Hotel.id == hotel_id).first()
-
-        # Verifica se o hotel existe
-        if not hotel:
-            return None
-
-        # Atualiza os campos fornecidos no schema
-        for key, value in update_data.dict(exclude_unset=True).items():
-            setattr(hotel, key, value)
-
-        # Salva as alterações no banco de dados
-        self.db.commit()
-        self.db.refresh(hotel)
-        return hotel

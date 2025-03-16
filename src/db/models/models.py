@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, ForeignKey, Integer, String, Float, Boolean
+from sqlalchemy import Table, Column, ForeignKey, Integer, String, Float, Boolean, Time
 from db.config.database import Base
 from sqlalchemy.orm import relationship
 
@@ -45,22 +45,46 @@ class Hotel(Base):
     state = Column(String, nullable=False)
     cep = Column(String, nullable=False)
 
-    #redes sociais
-    social_media = Column(String)
+
+    management_hotel = relationship('ManagementHotel', back_populates='hotel')
+    amenities = relationship('Amenity', back_populates='hotel')
+    rooms = relationship('Room', back_populates='hotel')
+    departments = relationship('Department', back_populates='hotel')
+    users = relationship('User', back_populates='hotel')  # Relaciona usuários com hotéis
+
+
+class ManagementHotel(Base):
+    __tablename__ = 'management_hotel'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    image_hotel_url = Column(String)
+
+    #Redes sociais
+    instagram_url = Column(String)
+    facebook_url = Column(String)
 
     #Wi-fi
     wifi_network = Column(String)
     wifi_password = Column(String)
 
-    #Comodidades (Amenity)
-    amenity = Column(String)
-    start_time = Column(String)
-    end_time = Column(String)
+    #others numbers from hotel by patch
+    reception_phone = Column(String)
+    reservation_phone = Column(String)
 
+    hotel_id = Column(Integer, ForeignKey('hotels.id'))
+    hotel = relationship('Hotel', back_populates='management_hotel')
 
-    rooms = relationship('Room', back_populates='hotel')
-    departments = relationship('Department', back_populates='hotel')
-    users = relationship('User', back_populates='hotel')  # Relaciona usuários com hotéis
+class Amenity(Base):
+    __tablename__ = 'amenities'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)    
+    start_time = Column(String, nullable=False) 
+    end_time = Column(String, nullable=False)    
+    hotel_id = Column(Integer, ForeignKey('hotels.id'))  
+
+    hotel = relationship('Hotel', back_populates='amenities')
+
 
 
 class Guest(Base):
@@ -91,7 +115,10 @@ class Department(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String, nullable=False)
+    start_time = Column(String, nullable=True) 
+    end_time = Column(String, nullable=True)    
     hotel_id = Column(Integer, ForeignKey('hotels.id'))
+    image_url = Column(String, nullable=False)
 
     hotel = relationship('Hotel', back_populates='departments')
     requests = relationship('Request', back_populates='department')
@@ -104,7 +131,11 @@ class Service(Base):
     name = Column(String, nullable=False)
     price = Column(Float)
     department_id = Column(Integer, ForeignKey('departments.id')) 
+    start_time = Column(Time, nullable=True)  
+    end_time = Column(Time, nullable=True)    
+    is_24_hours = Column(Boolean, default=False)  
     hotel_id = Column(Integer, ForeignKey('hotels.id'))
+    image_url = Column(String, nullable=False)
 
     department = relationship("Department", back_populates="service") 
 
@@ -121,7 +152,7 @@ class Request(Base):
     department_id = Column(Integer, ForeignKey('departments.id'))
 
     guest = relationship("Guest", back_populates="requests")
-    department = relationship("Department", back_populates="requests")  
+    department = relationship("Department", back_populates="requests")
 
 # Relacionamento bidirecional de roles e usuários
 Role.users = relationship('User', back_populates='role')
