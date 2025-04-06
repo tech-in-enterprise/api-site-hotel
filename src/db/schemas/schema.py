@@ -71,10 +71,11 @@ class ManagementHotelSchema(BaseModel):
 
 class AmenitySchema(BaseModel):
     id: Optional[int] = None
-    name: str
-    start_time: str
-    end_time: str
-    hotel_id: int
+    image_amenity_url: Optional[str] = None
+    name: Optional[str] = None
+    start_time: Optional[str] = None
+    end_time: Optional[str] = None
+    hotel_id: Optional[str] = None
 
     class Config:
         orm_mode = True
@@ -85,6 +86,18 @@ class DepartmentSchema(BaseModel):
     image_url: str
     start_time: str
     end_time: str
+    hotel_id: int
+
+    class Config:
+        orm_mode = True
+
+
+class UpdateDepartmentSchema(BaseModel):
+    id: Optional[int] = None
+    name: Optional[str] = None
+    image_url: Optional[str] = None
+    start_time: Optional[str] = None
+    end_time: Optional[str] = None
     hotel_id: int
 
     class Config:

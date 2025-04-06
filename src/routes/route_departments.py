@@ -54,6 +54,39 @@ def add_department(department: schema.DepartmentSchema, db: Session = Depends(ge
     return department_created
 
 
+from fastapi import Body
+
+
+# Update Department
+@router.put('/departments/{department_id}', status_code=status.HTTP_200_OK)
+def update_department( department_id: int, department_update: schema.UpdateDepartmentSchema = Body(...), db: Session = Depends(get_db), current_user: models.User = Depends(get_user_logged_in)):
+    
+    # Validar o papel do usuário
+    validate_user_role(current_user, allowed_roles=['Administrador', 'Gerente'])
+
+    # Buscar o departamento
+    department_db = db.query(models.Department).filter(models.Department.id == department_id).first()
+
+    if not department_db:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Departamento não encontrado.")
+
+    # Verificar permissão para gerentes
+    if current_user.role.access_level == "Gerente":
+        if department_db.hotel_id != current_user.hotel_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Você não tem permissão para editar este departamento.")
+        department_update.hotel_id = current_user.hotel_id  # Garante que o gerente não troque o hotel_id
+
+    # Se for administrador, usa o hotel_id informado (ou mantém o atual)
+    elif current_user.role.access_level == "Administrador":
+        department_update.hotel_id = department_update.hotel_id or department_db.hotel_id
+
+    # Atualiza
+    updated_department = Departments(db).update_department(department_id, department_update)
+
+    return updated_department
+
+
+
 # Delete Department from hotel
 @router.delete('/departments/{department_id}', status_code=status.HTTP_200_OK)
 def remove_department(department_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_user_logged_in)):

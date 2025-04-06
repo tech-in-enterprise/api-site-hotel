@@ -12,6 +12,7 @@ class Amenity():
     #Post Dependencies
     def create_amenity_in_db(self, amenity: schema.AmenitySchema):
         db_amenity = models.Amenity(
+            image_amenity_url=amenity.image_amenity_url,
             name=amenity.name.title(),
             start_time=amenity.start_time,
             end_time=amenity.end_time,

@@ -58,28 +58,50 @@ def update_amenity_hotel( updated_amenity_hotel: schema.AmenitySchema, db: Sessi
     validate_user_role(current_user, allowed_roles=['Administrador', 'Gerente'])
 
     # Busca o ManagementHotel no banco
-    db_amenity_hotel = db.query(models.Amenity).filter(models.Amenity.hotel_id == current_user.hotel_id).first()
+    db_amenity_hotel = db.query(models.Amenity).filter(
+        models.Amenity.id == updated_amenity_hotel.id,
+        models.Amenity.hotel_id == current_user.hotel_id
+    ).first()
 
     if not db_amenity_hotel:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Amenity não encontrado."
-        )
+        raise HTTPException( status_code=status.HTTP_404_NOT_FOUND, detail="Amenity não encontrado.")
 
     # Restrição para Gerente: só pode atualizar o hotel associado ao usuário
     if current_user.role.access_level == "Gerente" and db_amenity_hotel.hotel_id != current_user.hotel_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Gerentes só podem atualizar a Amenidade do seu hotel."
-        )
+        raise HTTPException( status_code=status.HTTP_403_FORBIDDEN, detail="Gerentes só podem atualizar a Amenidade do seu hotel.")
 
     # Atualiza os campos permitidos
     db_amenity_hotel.name = updated_amenity_hotel.name
     db_amenity_hotel.start_time = updated_amenity_hotel.start_time
     db_amenity_hotel.end_time = updated_amenity_hotel.end_time
+    db_amenity_hotel.image_amenity_url = updated_amenity_hotel.image_amenity_url
 
     # Commit no banco de dados
     db.commit()
     db.refresh(db_amenity_hotel)
 
     return db_amenity_hotel
+
+
+# Delete Amenity from hotel
+@router.delete('/amenities-hotel/{amenity_id}', status_code=status.HTTP_200_OK)
+def remove_amenity(amenity_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_user_logged_in)):
+
+    # Valida o papel do usuário
+    validate_user_role(current_user, allowed_roles=['Administrador', 'Gerente'])
+
+    # Busca a amenidade no banco
+    amenity = db.query(models.Amenity).filter(models.Amenity.id == amenity_id).first()
+
+    if not amenity:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Amenidade não encontrada.")
+
+    # Gerente só pode deletar amenidades do seu hotel
+    if current_user.role.access_level == "Gerente" and amenity.hotel_id != current_user.hotel_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Você não tem permissão para deletar esta amenidade.")
+
+    # Deleta a amenidade
+    db.delete(amenity)
+    db.commit()
+
+    return {"message": "Amenidade removida com sucesso"}

@@ -78,13 +78,13 @@ class Amenity(Base):
     __tablename__ = 'amenities'
     
     id = Column(Integer, primary_key=True, autoincrement=True)
+    image_amenity_url = Column(String)
     name = Column(String, nullable=False)    
     start_time = Column(String, nullable=False) 
     end_time = Column(String, nullable=False)    
     hotel_id = Column(Integer, ForeignKey('hotels.id'))  
 
     hotel = relationship('Hotel', back_populates='amenities')
-
 
 
 class Guest(Base):
